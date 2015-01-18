@@ -318,9 +318,10 @@ function! tbone#write_command(bang, line1, line2, count, target) abort
 
   let keys = join(filter(map(
         \ getline(a:line1, a:line2),
-        \ 'substitute(v:val,"^\\s*","","")'),
+        \ 'substitute(v:val,"^","","")'),
         \ "!empty(v:val)"),
         \ "\r")
+  let keys = keys."\r"
   if a:count > 0
     let keys = get(g:, 'tbone_write_initialization', '').keys."\r"
   endif
@@ -352,7 +353,7 @@ function! tbone#send_keys(target, keys) abort
     call writefile(split(a:keys, "\r", 1), temp, 'b')
     let out = system('tmux load-buffer '.temp.' \; paste-buffer -d -t '.pane_id)
   else
-    let out = system('tmux send-keys -t '.pane_id.' "" '.shellescape(a:keys))
+    let out = system('tmux send-keys -t '.pane_id.' '.shellescape(keys))
   endif
 
   if v:shell_error
